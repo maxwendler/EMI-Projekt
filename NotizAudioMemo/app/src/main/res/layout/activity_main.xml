@@ -11,6 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/ListViewNotes" />
+
         <android.support.design.widget.FloatingActionButton
             android:src="@drawable/ic_plus"
             app:fabSize="normal"

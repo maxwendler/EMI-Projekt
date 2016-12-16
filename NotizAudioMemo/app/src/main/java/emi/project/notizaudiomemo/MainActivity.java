@@ -10,6 +10,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +31,16 @@ public class MainActivity extends AppCompatActivity{
     private FloatingActionButton btNewNote;
     private DrawerLayout drawer; //der Drawer an sich
     private ListView drawerList; //die Liste der Items darin
+    private ListView noteList;
 
     //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Notiz automatisch (noteNumber+1)
     //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Muss später beim Start der App
     //geladen werden.
     private int noteNumber;
+
+    private File mainDataTxt;
+    private ArrayList noteTitles;
+    private ArrayAdapter<String> noteListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +54,70 @@ public class MainActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
 
+        System.out.println("Debug");
+
         drawer.closeDrawers();  //Main startet & resumed mit geschlossenem Drawer
+
+        Intent receivedNoteTitle = getIntent();             //Notiz"titel" vom Editor empfangen
+
+        try {                                               //bei Start ist der type null
+            if (receivedNoteTitle.getType().equals("text")) {
+                createNoteListItem(receivedNoteTitle.getStringExtra("title"));
+            }
+        }catch (NullPointerException e){}
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // save();
+    }
+
+    @Override                   //um Intents auch bei on onResume verwenden zu können
+    protected void onNewIntent(Intent intent){
+        if (intent!=null){
+            setIntent(intent);
+        }
     }
 
     private void  IntializeActivity(){
 
+        //Linking
+        //Layout und Java-Code
+
+
         btNewNote= (FloatingActionButton) findViewById(R.id.FABnewNote);
+
         drawerList= (ListView) findViewById(R.id.left_drawer);
+        noteList= (ListView) findViewById(R.id.ListViewNotes);
+
         drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
 
+
+        //Intialisierung
+        //
+
+
         noteNumber=0;   //nur beim ersten Öffnen der App auf Gerät, später laden
+
+        noteTitles = new ArrayList();
+        noteListAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteTitles);
+
+        //Datei wird geladen, wenn sie existiert
+        mainDataTxt = new File(getFilesDir(),"mainData.txt");
+        if (mainDataTxt.exists()){
+            load();
+        }
 
         //Drawer mit Items füllen
         ArrayList drawerItems = new ArrayList();
         drawerItems.add("Notizen");drawerItems.add("Papierkorb");drawerItems.add("Einstellungen");
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
+
+
+        //Widgetkonfiguaration
+        //
 
         btNewNote.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,8 +141,6 @@ public class MainActivity extends AppCompatActivity{
         openNoteEditor.putExtra("ID",noteNumber);
         startActivity(openNoteEditor);
 
-        noteNumber++; //haben ja eine Notiz mehr
-
     }
 
     //Starten der Activities über den Drawer
@@ -100,4 +161,50 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
+    private void createNoteListItem(String title){
+
+        noteTitles.add(title);
+        noteList.setAdapter(noteListAdapter);
+
+        noteNumber++; //haben ja eine Notiz mehr
+    }
+
+    //Speichert Datei mit allen bei Neustart relevanten Daten
+  /*  private void save(){
+        String data;
+
+        try{mainDataTxt.createNewFile();
+        } catch (IOException e){}
+
+        FileOutputStream writer = null;
+        try {writer=new FileOutputStream(mainDataTxt);
+        }catch (FileNotFoundException e){}
+
+        data="noteNumber:\n"+noteNumber;
+
+        try{writer.write(data.getBytes());
+        } catch (IOException e) {}
+
+    }   */
+
+    //lädt Datei mit allen bei Neustart relevanten Daten
+    private void load(){
+        String readLine="";
+
+        InputStream LoadS=null;
+        try {LoadS = new FileInputStream(getFilesDir()+"/mainData.txt");
+        }catch (FileNotFoundException e){}
+
+        Reader LoadSR= new InputStreamReader(LoadS);
+        BufferedReader LoadBR = new BufferedReader(LoadSR);
+
+        try {                                                            //Auslesen
+            while ((readLine = LoadBR.readLine()) != null) {
+                if (readLine.contains("noteNumber")){
+                    noteNumber=Integer.valueOf(LoadBR.readLine());
+                }
+            }
+        }catch (IOException e) {}
+    }
 }
