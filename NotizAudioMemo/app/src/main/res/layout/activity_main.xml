@@ -25,6 +25,15 @@
             android:layout_height="wrap_content"
             android:id="@+id/FABnewNote" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonClear"
+            android:text="Clear"
+            app:layout_anchor="@+id/ListViewNotes"
+            app:layout_anchorGravity="top|left"
+            android:layout_gravity="center_vertical|center_horizontal" />
+
     </android.support.design.widget.CoordinatorLayout>
 
     <!-- Das nicht! -->

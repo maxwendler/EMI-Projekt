@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.BufferedReader;
@@ -29,6 +30,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
 
     private FloatingActionButton btNewNote;
+    private Button btClear;
     private DrawerLayout drawer; //der Drawer an sich
     private ListView drawerList; //die Liste der Items darin
     private ListView noteList;
@@ -50,11 +52,10 @@ public class MainActivity extends AppCompatActivity{
         IntializeActivity();
     }
 
+    //ACHTUNG! Findet immer 2 mal statt, wenn mit Activity mit Intent über Back-Button aufgerufen
     @Override
     protected void onResume() {
         super.onResume();
-
-        System.out.println("Debug");
 
         drawer.closeDrawers();  //Main startet & resumed mit geschlossenem Drawer
 
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity{
         try {                                               //bei Start ist der type null
             if (receivedNoteTitle.getType().equals("text")) {
                 createNoteListItem(receivedNoteTitle.getStringExtra("title"));
+                receivedNoteTitle.setType(null);
             }
         }catch (NullPointerException e){}
     }
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onStop() {
         super.onStop();
 
-        // save();
+        save();
     }
 
     @Override                   //um Intents auch bei on onResume verwenden zu können
@@ -81,6 +83,13 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+
+        // System.out.println("DebugPause");
+    }
+
     private void  IntializeActivity(){
 
         //Linking
@@ -88,6 +97,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         btNewNote= (FloatingActionButton) findViewById(R.id.FABnewNote);
+        btClear = (Button) findViewById(R.id.buttonClear);
 
         drawerList= (ListView) findViewById(R.id.left_drawer);
         noteList= (ListView) findViewById(R.id.ListViewNotes);
@@ -99,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
         //
 
 
-        noteNumber=0;   //nur beim ersten Öffnen der App auf Gerät, später laden
+        //nur beim ersten Öffnen der App auf Gerät, später laden
 
         noteTitles = new ArrayList();
         noteListAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteTitles);
@@ -108,7 +118,7 @@ public class MainActivity extends AppCompatActivity{
         mainDataTxt = new File(getFilesDir(),"mainData.txt");
         if (mainDataTxt.exists()){
             load();
-        }
+        } else {noteNumber=0;}
 
         //Drawer mit Items füllen
         ArrayList drawerItems = new ArrayList();
@@ -123,6 +133,13 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 createNote();
+            }
+        });
+
+        btClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clear();
             }
         });
 
@@ -141,6 +158,12 @@ public class MainActivity extends AppCompatActivity{
         openNoteEditor.putExtra("ID",noteNumber);
         startActivity(openNoteEditor);
 
+    }
+
+    private void clear(){
+        noteTitles.clear();
+        noteList.setAdapter(noteListAdapter);
+        noteNumber=0;
     }
 
     //Starten der Activities über den Drawer
@@ -164,15 +187,21 @@ public class MainActivity extends AppCompatActivity{
     //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
     private void createNoteListItem(String title){
 
-        noteTitles.add(title);
-        noteList.setAdapter(noteListAdapter);
+
+        noteTitles.add("");                             //so dass Elemente oben einsortiert werden
+        for (int i=noteTitles.size()-1;i>0;i--){
+            noteTitles.set(i,noteTitles.get(i-1));
+            noteTitles.set(i-1,"");
+        }
+        noteTitles.set(0,title);
+        noteList.setAdapter(noteListAdapter);           //aktualisiert Liste
 
         noteNumber++; //haben ja eine Notiz mehr
     }
 
     //Speichert Datei mit allen bei Neustart relevanten Daten
-  /*  private void save(){
-        String data;
+    private void save(){
+        String data,noteTitlesString="";
 
         try{mainDataTxt.createNewFile();
         } catch (IOException e){}
@@ -181,12 +210,19 @@ public class MainActivity extends AppCompatActivity{
         try {writer=new FileOutputStream(mainDataTxt);
         }catch (FileNotFoundException e){}
 
-        data="noteNumber:\n"+noteNumber;
+        for (int i=0;i<noteNumber;i++){
+            noteTitlesString=noteTitlesString+noteTitles.get(i)+"\n";
+        }
+
+        data="noteNumber:\n"
+                +noteNumber+"\n"+
+             "noteTitles\n"+
+                noteTitlesString;
 
         try{writer.write(data.getBytes());
         } catch (IOException e) {}
 
-    }   */
+    }
 
     //lädt Datei mit allen bei Neustart relevanten Daten
     private void load(){
@@ -201,10 +237,17 @@ public class MainActivity extends AppCompatActivity{
 
         try {                                                            //Auslesen
             while ((readLine = LoadBR.readLine()) != null) {
-                if (readLine.contains("noteNumber")){
+                if (readLine.contains("noteNumber")){                    //noteNumber auslesen
                     noteNumber=Integer.valueOf(LoadBR.readLine());
+                }
+                if (readLine.contains("noteTitles")){                    //Notizliste auslesen
+                    for (int i=0;i<noteNumber;i++){
+                        noteTitles.add(LoadBR.readLine());
+                    }
                 }
             }
         }catch (IOException e) {}
+
+        noteList.setAdapter(noteListAdapter);
     }
 }
