@@ -4,6 +4,7 @@ package emi.project.notizaudiomemo;
  * Created by Max on 19.12.2016.
  */
 
+
 /**
  * 2 Arrays, die immer als verknüpft behandelt werden
  * Damit kann zu jeder Notiz eine ID gespeichert werden, was für das Speichern und Laden

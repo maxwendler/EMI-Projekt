@@ -27,7 +27,7 @@ import java.util.List;
  * Created by Max on 15.12.2016.
  */
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton btNewNote;
     private Button btClear;
@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity{
                 createNoteListItem(receivedNoteTitle.getStringExtra("title"));
                 receivedNoteTitle.setType(null);
             }
-        }catch (NullPointerException e){}
+        } catch (NullPointerException e) {
+        }
     }
 
     @Override
@@ -77,30 +78,30 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override                   //um Intents auch bei on onResume verwenden zu können
-    protected void onNewIntent(Intent intent){
-        if (intent!=null){
+    protected void onNewIntent(Intent intent) {
+        if (intent != null) {
             setIntent(intent);
         }
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
 
         // System.out.println("DebugPause");
     }
 
-    private void  IntializeActivity(){
+    private void IntializeActivity() {
 
         //Linking
         //Layout und Java-Code
 
 
-        btNewNote= (FloatingActionButton) findViewById(R.id.FABnewNote);
+        btNewNote = (FloatingActionButton) findViewById(R.id.FABnewNote);
         btClear = (Button) findViewById(R.id.buttonClear);
 
-        drawerList= (ListView) findViewById(R.id.left_drawer);
-        noteListView= (ListView) findViewById(R.id.ListViewNotes);
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        noteListView = (ListView) findViewById(R.id.ListViewNotes);
 
         drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
 
@@ -110,17 +111,21 @@ public class MainActivity extends AppCompatActivity{
 
 
         noteList = new NoteArray();
-        noteListViewAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteList.getTitles());
+        noteListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, noteList.getTitles());
 
         //Datei wird geladen, wenn sie existiert
-        mainDataTxt = new File(getFilesDir(),"mainData.txt");
-        if (mainDataTxt.exists()){
+        mainDataTxt = new File(getFilesDir(), "mainData.txt");
+        if (mainDataTxt.exists()) {
             load();
-        } else {noteNumber=0;}
+        } else {
+            noteNumber = 0;
+        }
 
         //Drawer mit Items füllen
         ArrayList drawerItems = new ArrayList();
-        drawerItems.add("Notizen");drawerItems.add("Papierkorb");drawerItems.add("Einstellungen");
+        drawerItems.add("Notizen");
+        drawerItems.add("Papierkorb");
+        drawerItems.add("Einstellungen");
         drawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems));
 
 
@@ -150,32 +155,32 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //Intent zum Öffnen des Notizeditors, schickt ID, damit Editor dann Notiz speichern kann
-    private void createNote(){
+    private void createNote() {
 
         Intent openNoteEditor = new Intent(this, NoteEditorActivity.class);
-        openNoteEditor.putExtra("ID",noteNumber);
+        openNoteEditor.putExtra("id", noteNumber+1);
         startActivity(openNoteEditor);
 
     }
 
-    private void clear(){
+    private void clear() {
         noteList.clear();
-        noteListView.setAdapter(noteListViewAdapter);
-        noteNumber=0;
+        updateNoteListView();
+        noteNumber = 0;
     }
 
     //Starten der Activities über den Drawer
     //Papierkorb und Settings schließen sich beim Öffnen einer anderen Activity selbst
     //Damit haben wir lediglich immer die Main laufen.
-    private void changeActivity(int position){
-        if (position!=0){
-            switch (position){
+    private void changeActivity(int position) {
+        if (position != 0) {
+            switch (position) {
                 case 1:
-                    Intent openRecycleBin = new Intent(this,RecycleBinActivity.class);
+                    Intent openRecycleBin = new Intent(this, RecycleBinActivity.class);
                     startActivity(openRecycleBin);
                     break;
                 case 2:
-                    Intent openSettings = new Intent(this,SettingsActivity.class);
+                    Intent openSettings = new Intent(this, SettingsActivity.class);
                     startActivity(openSettings);
 
             }
@@ -183,64 +188,81 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
-    private void createNoteListItem(String title){
+    private void createNoteListItem(String title) {
         noteNumber++;
-        int id=noteNumber;
+        int id = noteNumber;
 
-        noteList.add(id,title);
+        noteList.add(id, title);
 
-        noteListView.setAdapter(noteListViewAdapter);           //aktualisiert Liste
+        updateNoteListView();        //aktualisiert Liste
+
     }
 
     //Speichert Datei mit allen bei Neustart relevanten Daten
-    private void save(){
-        String data,noteTitlesString="";
+    private void save() {
+        String data, noteTitlesString = "";
 
-        try{mainDataTxt.createNewFile();
-        } catch (IOException e){}
-
-        FileOutputStream writer = null;
-        try {writer=new FileOutputStream(mainDataTxt);
-        }catch (FileNotFoundException e){}
-
-        for (int i=0;i<noteNumber;i++){
-            noteTitlesString=noteTitlesString+noteList.getTitles()[i]+"\n";
+        try {
+            mainDataTxt.createNewFile();
+        } catch (IOException e) {
         }
 
-        data="noteNumber:\n"
-                +noteNumber+"\n"+
-             "noteTitles\n"+
+        FileOutputStream writer = null;
+        try {
+            writer = new FileOutputStream(mainDataTxt);
+        } catch (FileNotFoundException e) {
+        }
+
+        for (int i = 0; i < noteNumber; i++) {
+            noteTitlesString = noteTitlesString + noteList.getTitles()[i] + "\n";
+        }
+
+        data = "noteNumber:\n"
+                + noteNumber + "\n" +
+                "noteTitles\n" +
                 noteTitlesString;
 
-        try{writer.write(data.getBytes());
-        } catch (IOException e) {}
+        try {
+            writer.write(data.getBytes());
+        } catch (IOException e) {
+        }
 
     }
 
     //lädt Datei mit allen bei Neustart relevanten Daten
-    private void load(){
-        String readLine="";
+    private void load() {
+        String readLine = "";
 
-        InputStream LoadS=null;
-        try {LoadS = new FileInputStream(getFilesDir()+"/mainData.txt");
-        }catch (FileNotFoundException e){}
+        InputStream LoadS = null;
+        try {
+            LoadS = new FileInputStream(getFilesDir() + "/mainData.txt");
+        } catch (FileNotFoundException e) {
+        }
 
-        Reader LoadSR= new InputStreamReader(LoadS);
+        Reader LoadSR = new InputStreamReader(LoadS);
         BufferedReader LoadBR = new BufferedReader(LoadSR);
 
         try {                                                            //Auslesen
             while ((readLine = LoadBR.readLine()) != null) {
-                if (readLine.contains("noteNumber")){                    //noteNumber auslesen
-                    noteNumber=Integer.valueOf(LoadBR.readLine());
+                if (readLine.contains("noteNumber")) {                    //noteNumber auslesen
+                    noteNumber = Integer.valueOf(LoadBR.readLine());
                 }
-                if (readLine.contains("noteTitles")){                    //Notizliste auslesen
-                    for (int i=0;i<noteNumber;i++){
-                        noteList.add(i+1,LoadBR.readLine());
+                if (readLine.contains("noteTitles")) {                    //Notizliste auslesen
+                    for (int i = 0; i < noteNumber; i++) {
+                        noteList.add(i + 1, LoadBR.readLine());
                     }
                 }
             }
-        }catch (IOException e) {}
+        } catch (IOException e) {
+        }
 
+        updateNoteListView();
+    }
+
+    private void updateNoteListView() {
+        noteListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, noteList.getTitles());
         noteListView.setAdapter(noteListViewAdapter);
     }
+
 }
+
