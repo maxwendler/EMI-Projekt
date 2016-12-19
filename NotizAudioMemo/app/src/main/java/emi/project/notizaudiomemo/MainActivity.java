@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity{
     private Button btClear;
     private DrawerLayout drawer; //der Drawer an sich
     private ListView drawerList; //die Liste der Items darin
-    private ListView noteList;
+    private ListView noteListView;
 
     //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Notiz automatisch (noteNumber+1)
     //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Muss später beim Start der App
@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity{
     private int noteNumber;
 
     private File mainDataTxt;
-    private ArrayList noteTitles;
-    private ArrayAdapter<String> noteListAdapter;
+    private NoteArray noteList;
+    private ArrayAdapter<String> noteListViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity{
         btClear = (Button) findViewById(R.id.buttonClear);
 
         drawerList= (ListView) findViewById(R.id.left_drawer);
-        noteList= (ListView) findViewById(R.id.ListViewNotes);
+        noteListView= (ListView) findViewById(R.id.ListViewNotes);
 
         drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
 
@@ -109,10 +109,8 @@ public class MainActivity extends AppCompatActivity{
         //
 
 
-        //nur beim ersten Öffnen der App auf Gerät, später laden
-
-        noteTitles = new ArrayList();
-        noteListAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteTitles);
+        noteList = new NoteArray();
+        noteListViewAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,noteList.getTitles());
 
         //Datei wird geladen, wenn sie existiert
         mainDataTxt = new File(getFilesDir(),"mainData.txt");
@@ -161,8 +159,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void clear(){
-        noteTitles.clear();
-        noteList.setAdapter(noteListAdapter);
+        noteList.clear();
+        noteListView.setAdapter(noteListViewAdapter);
         noteNumber=0;
     }
 
@@ -186,17 +184,12 @@ public class MainActivity extends AppCompatActivity{
 
     //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
     private void createNoteListItem(String title){
+        noteNumber++;
+        int id=noteNumber;
 
+        noteList.add(id,title);
 
-        noteTitles.add("");                             //so dass Elemente oben einsortiert werden
-        for (int i=noteTitles.size()-1;i>0;i--){
-            noteTitles.set(i,noteTitles.get(i-1));
-            noteTitles.set(i-1,"");
-        }
-        noteTitles.set(0,title);
-        noteList.setAdapter(noteListAdapter);           //aktualisiert Liste
-
-        noteNumber++; //haben ja eine Notiz mehr
+        noteListView.setAdapter(noteListViewAdapter);           //aktualisiert Liste
     }
 
     //Speichert Datei mit allen bei Neustart relevanten Daten
@@ -211,7 +204,7 @@ public class MainActivity extends AppCompatActivity{
         }catch (FileNotFoundException e){}
 
         for (int i=0;i<noteNumber;i++){
-            noteTitlesString=noteTitlesString+noteTitles.get(i)+"\n";
+            noteTitlesString=noteTitlesString+noteList.getTitles()[i]+"\n";
         }
 
         data="noteNumber:\n"
@@ -242,12 +235,12 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (readLine.contains("noteTitles")){                    //Notizliste auslesen
                     for (int i=0;i<noteNumber;i++){
-                        noteTitles.add(LoadBR.readLine());
+                        noteList.add(i+1,LoadBR.readLine());
                     }
                 }
             }
         }catch (IOException e) {}
 
-        noteList.setAdapter(noteListAdapter);
+        noteListView.setAdapter(noteListViewAdapter);
     }
 }
