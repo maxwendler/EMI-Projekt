@@ -4,6 +4,7 @@ package emi.project.notizaudiomemo;
  * Created by Max on 19.12.2016.
  */
 
+import java.util.Arrays;
 
 /**
  * 2 Arrays, die immer als verknüpft behandelt werden
@@ -28,35 +29,27 @@ public class NoteArray {
         return titles;
     }
 
-
-    //Könnte man evtl gebrauchen, können wir ja dann ggf implentieren
-    /*public int getIdByTitle (String title){
+    public int getIdByTitle (String title){
         int index=0;
 
-        if (!(titles.length==0)){
-            //index = Position des Objektes
-            return ids[index];
-
-        } else {
-            //Fehlermeldung
-        }
-
-
+        if (Arrays.asList(titles).contains(title)) {
+            index = Arrays.asList(titles).indexOf(title);
+            if (!(titles.length==0)) {
+                return ids[index];
+            } else {return -1;}
+        } else {return -2;}
     }
 
     public String getTitleById (int id){
         int index=0;
 
-        if (!(titles.length==0)){
-            //index = Position des Objektes
-            return titles[index];
-
-        } else {
-            //Fehlermeldung
-            return null;
-        }
-
-    }   */
+        if (Arrays.asList(ids).contains(id)) {
+            index = Arrays.asList(ids).indexOf(id);
+            if (!(ids.length==0)) {
+                return titles[index];
+            } else {return null;}
+        } else {return null;}
+    }
 
     //Funktion getItem, die beides auf einmal returned (falls wir es brauchen)
 
@@ -67,7 +60,6 @@ public class NoteArray {
 
     //fügt neues Element am Index 0 hinzu, verschiebt den Rest nach hinten
     public void add(int id,String title){
-        System.out.println("Debug");
         int[] a=ids;
         String[] b=titles;
 

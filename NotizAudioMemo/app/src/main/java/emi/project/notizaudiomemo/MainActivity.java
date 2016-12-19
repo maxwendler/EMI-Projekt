@@ -84,14 +84,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // System.out.println("DebugPause");
-    }
-
-    private void IntializeActivity() {
+     private void IntializeActivity() {
 
         //Linking
         //Layout und Java-Code
@@ -152,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
                 changeActivity(position);
             }
         });
+
+        noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openNote(parent.getItemAtPosition(position).toString());
+            }
+        });
     }
 
     //Intent zum Öffnen des Notizeditors, schickt ID, damit Editor dann Notiz speichern kann
@@ -163,10 +163,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Öffnet den Editor und sendet die ID der gewählten Notiz, damit Editor diese Laden kann
+    //Der Type zeigt dem Editor an, dass er laden muss
+    private void openNote(String title){
+
+        int id=noteList.getIdByTitle(title);
+
+        Intent openNoteInEditor = new Intent(this, NoteEditorActivity.class);
+        openNoteInEditor.setType("activator");
+        openNoteInEditor.putExtra("id",id);
+        startActivity(openNoteInEditor);
+
+    }
+
+    //Löscht alle Notizen
     private void clear() {
         noteList.clear();
         updateNoteListView();
         noteNumber = 0;
+
+        File notesDir = new File(getFilesDir(),"notes");
+        if (notesDir.exists()){
+            notesDir.delete();
+        }
     }
 
     //Starten der Activities über den Drawer
@@ -198,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Speichert Datei mit allen bei Neustart relevanten Daten
+    //Speichert Datei mit allen bei Neustart relevanten Daten (noteNumber und Titel der Notizen)
     private void save() {
         String data, noteTitlesString = "";
 
@@ -229,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //lädt Datei mit allen bei Neustart relevanten Daten
+    //lädt Datei mit allen bei Neustart relevanten Daten (noteNumber und Titel der Notizen)
     private void load() {
         String readLine = "";
 
@@ -259,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         updateNoteListView();
     }
 
+    //aktualisiert Notizliste
     private void updateNoteListView() {
         noteListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, noteList.getTitles());
         noteListView.setAdapter(noteListViewAdapter);
