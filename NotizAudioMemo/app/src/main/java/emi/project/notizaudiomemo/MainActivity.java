@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -210,6 +211,10 @@ public class MainActivity extends AppCompatActivity {
     private void createNoteListItem(String title, String type) {
         lastId++;
         int id = lastId;
+
+        if(Arrays.asList(noteList.getTitles()).contains(title)){                //Damit Titel eindeutig sind
+            title=title+" ";                                                    //Aber keinen Einfluss auf Inhalt der Notiz
+        }
 
         noteList.add(id, title,type);
 
