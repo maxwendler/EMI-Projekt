@@ -35,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private ListView drawerList; //die Liste der Items darin
     private ListView noteListView;
 
-    //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Notiz automatisch (noteNumber+1)
+    //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Notiz automatisch (lastId+1)
     //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Muss später beim Start der App
     //geladen werden.
-    private int noteNumber;
+    private int lastId;
 
     private File mainDataTxt;
     private NoteArray noteList;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {                                               //bei Start ist der type null
             if (receivedNoteTitle.getType().equals("text")) {
-                createNoteListItem(receivedNoteTitle.getStringExtra("title"));
+                createNoteListItem(receivedNoteTitle.getStringExtra("title"),"text");
                 receivedNoteTitle.setType(null);
             }
         } catch (NullPointerException e) {
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         if (mainDataTxt.exists()) {
             load();
         } else {
-            noteNumber = 0;
+            lastId = 0;
         }
 
         //Drawer mit Items füllen
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     private void createNote() {
 
         Intent openNoteEditor = new Intent(this, NoteEditorActivity.class);
-        openNoteEditor.putExtra("id", noteNumber+1);
+        openNoteEditor.putExtra("id", lastId+1);
         startActivity(openNoteEditor);
 
     }
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
     private void clear() {
         noteList.clear();
         updateNoteListView();
-        noteNumber = 0;
+        lastId = 0;
 
         File notesDir = new File(getFilesDir(),"notes");
         if (notesDir.exists()){
@@ -207,19 +207,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
-    private void createNoteListItem(String title) {
-        noteNumber++;
-        int id = noteNumber;
+    private void createNoteListItem(String title, String type) {
+        lastId++;
+        int id = lastId;
 
-        noteList.add(id, title);
+        noteList.add(id, title,type);
 
         updateNoteListView();        //aktualisiert Liste
 
     }
 
-    //Speichert Datei mit allen bei Neustart relevanten Daten (noteNumber und Titel der Notizen)
+    //Speichert Datei mit allen bei Neustart relevanten Daten (lastId und Titel der Notizen)
     private void save() {
-        String data, noteTitlesString = "";
+        String data, noteTitleAndTypeString = "";
 
         try {
             mainDataTxt.createNewFile();
@@ -232,14 +232,15 @@ public class MainActivity extends AppCompatActivity {
         } catch (FileNotFoundException e) {
         }
 
-        for (int i = 0; i < noteNumber; i++) {
-            noteTitlesString = noteTitlesString + noteList.getTitles()[i] + "\n";
+        for (int i = 0; i < lastId; i++) {
+            noteTitleAndTypeString = noteTitleAndTypeString + noteList.getTitles()[i] + ","+
+                                     noteList.getTypes()[i]+"\n";
         }
 
-        data = "noteNumber:\n"
-                + noteNumber + "\n" +
+        data = "lastId:\n"
+                + lastId + "\n" +
                 "noteTitles\n" +
-                noteTitlesString;
+                noteTitleAndTypeString;
 
         try {
             writer.write(data.getBytes());
@@ -248,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //lädt Datei mit allen bei Neustart relevanten Daten (noteNumber und Titel der Notizen)
+    //lädt Datei mit allen bei Neustart relevanten Daten (lastId und Titel der Notizen)
     private void load() {
         String readLine = "";
 
@@ -263,12 +264,27 @@ public class MainActivity extends AppCompatActivity {
 
         try {                                                            //Auslesen
             while ((readLine = LoadBR.readLine()) != null) {
-                if (readLine.contains("noteNumber")) {                    //noteNumber auslesen
-                    noteNumber = Integer.valueOf(LoadBR.readLine());
+                if (readLine.contains("lastId")) {                    //lastId auslesen
+                    lastId = Integer.valueOf(LoadBR.readLine());
                 }
                 if (readLine.contains("noteTitles")) {                    //Notizliste auslesen
-                    for (int i = 0; i < noteNumber; i++) {
-                        noteList.add(i + 1, LoadBR.readLine());
+                    for (int i = 0; i < lastId; i++) {
+                        String title="", type="", character;
+                        int j=0;
+
+                        readLine=LoadBR.readLine();
+                        while (!(character=String.valueOf(readLine.charAt(j))).equals(",")){
+                            title=title+character;
+                            j++;
+                        }
+
+                        j++;
+
+                        if (String.valueOf(readLine.charAt(j)).equals("t")){
+                            type="text";
+                        } else {type="audio";}
+
+                        noteList.add(i + 1, title,type);
                     }
                 }
             }
