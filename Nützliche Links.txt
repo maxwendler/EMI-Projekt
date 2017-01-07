@@ -7,4 +7,5 @@ http://www.androidauthority.com/using-coordinatorlayout-android-apps-703720/
 http://saulmm.github.io/mastering-coordinator
 https://developer.android.com/training/implementing-navigation/nav-drawer.html
 https://developer.android.com/reference/android/support/v4/widget/DrawerLayout.html#isDrawerOpen(int)
+https://developer.android.com/guide/topics/ui/dialogs.html
 

@@ -13,17 +13,17 @@ import java.util.Arrays;
  */
 
 public class NoteArray {
-    private int [] ids;
+    private String [] ids;
     private String [] titles;
     private String [] types;
 
     public NoteArray(){
-        ids=new int[0];
+        ids=new String[0];
         titles= new String[0];
         types= new String[0];
     }
 
-    public int [] getIds(){
+    public String [] getIds(){
         return ids;
     }
 
@@ -33,18 +33,18 @@ public class NoteArray {
 
     public String[] getTypes() {return types;}
 
-    public int getIdByTitle (String title){
+    public String getIdByTitle (String title){
         int index=0;
 
         if (Arrays.asList(titles).contains(title)) {
             index = Arrays.asList(titles).indexOf(title);
             if (!(titles.length==0)) {
                 return ids[index];
-            } else {return -1;}
-        } else {return -2;}
+            } else {return null;}
+        } else {return null;}
     }
 
-    public String getTitleById (int id){
+    public String getTitleById (String id){
         int index=0;
 
         if (Arrays.asList(ids).contains(id)) {
@@ -55,7 +55,7 @@ public class NoteArray {
         } else {return null;}
     }
 
-    public String getTypeById (int id){
+    public String getTypeById (String id){
         int index=0;
 
         if (Arrays.asList(ids).contains(id)) {
@@ -80,17 +80,17 @@ public class NoteArray {
     //Funktion getItem, die beides auf einmal returned (falls wir es brauchen)
 
     public void clear(){
-        ids=new int[0];
+        ids=new String[0];
         titles=new String[0];
     }
 
     //fügt neues Element am Index 0 hinzu, verschiebt den Rest nach hinten
-    public void add(int id,String title, String type){
-        int[] a=ids;
+    public void add(String id,String title, String type){
+        String[] a=ids;
         String[] b=titles;
         String[] c=types;
 
-        ids= new int[a.length+1];
+        ids= new String[a.length+1];
         titles= new String[b.length+1];
         types= new String[c.length+1];
 
@@ -103,6 +103,11 @@ public class NoteArray {
         ids[0]=id;
         titles[0]=title;
         types[0]=type;
+    }
+
+    public void edit(String title, String id){
+        int i= Arrays.asList(ids).indexOf(id);
+        titles[i]=title;
     }
 
     public void delete(){

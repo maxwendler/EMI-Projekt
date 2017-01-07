@@ -3,7 +3,10 @@ package emi.project.notizaudiomemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,7 +31,7 @@ import java.util.List;
  * Created by Max on 15.12.2016.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NoteTypeDialogFragment.NoticeDialogListener {
 
     private FloatingActionButton btNewNote;
     private Button btClear;
@@ -36,10 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView drawerList; //die Liste der Items darin
     private ListView noteListView;
 
-    //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Notiz automatisch (lastId+1)
-    //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Muss später beim Start der App
-    //geladen werden.
-    private int lastId;
+    //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Datei automatisch (lastId+1)
+    //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Für Typ seperat
+    private int lastNoteId,lastMemoId;
 
     private File mainDataTxt;
     private NoteArray noteList;
@@ -62,9 +64,18 @@ public class MainActivity extends AppCompatActivity {
 
         Intent receivedNoteTitle = getIntent();             //Notiz"titel" vom Editor empfangen
 
-        try {                                               //bei Start ist der type null
-            if (receivedNoteTitle.getType().equals("text")) {
+        try {
+            if (receivedNoteTitle.getType().equals("text")) {       //Neue Notiz
                 createNoteListItem(receivedNoteTitle.getStringExtra("title"),"text");
+                receivedNoteTitle.setType(null);
+            }
+            else if(receivedNoteTitle.getType().equals("changed text")){    //Bearbeitete Notiz
+                editNoteListItem(receivedNoteTitle.getStringExtra("title"),
+                                   receivedNoteTitle.getStringExtra("id"));
+                receivedNoteTitle.setType(null);
+            }
+            else if(receivedNoteTitle.getType().equals("audio")){           //Memo
+                createNoteListItem(receivedNoteTitle.getStringExtra("title"),"audio");
                 receivedNoteTitle.setType(null);
             }
         } catch (NullPointerException e) {
@@ -112,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
         if (mainDataTxt.exists()) {
             load();
         } else {
-            lastId = 0;
+            lastNoteId = 0;
+            lastMemoId = 0;
         }
 
         //Drawer mit Items füllen
@@ -155,12 +167,30 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //Intent zum Öffnen des Notizeditors, schickt ID, damit Editor dann Notiz speichern kann
+    //AlertDialog-Fenster zur Auswahl der zu erstellenden Notiz
     private void createNote() {
 
+        DialogFragment chooseTypeAlert = new NoteTypeDialogFragment();
+        chooseTypeAlert.show(getSupportFragmentManager(),"NoteTypeDialogFragment");
+
+    }
+
+    @Override               //Im AlertDialog "TEXT" ausgwählt
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
         Intent openNoteEditor = new Intent(this, NoteEditorActivity.class);
-        openNoteEditor.putExtra("id", lastId+1);
+        int id=lastNoteId+1;
+        openNoteEditor.putExtra("id", "note"+id);
         startActivity(openNoteEditor);
+    }
+
+    @Override               //Im AlterDialog "AUDIO" ausgewählt
+    public void onDialogPositiveClick(DialogFragment dialog) {
+
+        Intent openAudioRecorder = new Intent(this, AudioRecorderActivity.class);
+        int id=lastMemoId+1;
+        openAudioRecorder.putExtra("id","memo"+id);
+        startActivity(openAudioRecorder);
 
     }
 
@@ -168,20 +198,31 @@ public class MainActivity extends AppCompatActivity {
     //Der Type zeigt dem Editor an, dass er laden muss
     private void openNote(String title){
 
-        int id=noteList.getIdByTitle(title);
+        String id=noteList.getIdByTitle(title);
+        String type=noteList.getTypeByTitle(title);
 
-        Intent openNoteInEditor = new Intent(this, NoteEditorActivity.class);
-        openNoteInEditor.setType("activator");
-        openNoteInEditor.putExtra("id",id);
-        startActivity(openNoteInEditor);
+        if (type=="text") {
+            Intent openNoteInEditor = new Intent(this, NoteEditorActivity.class);
+            openNoteInEditor.setType("activator");
+            openNoteInEditor.putExtra("id", id);
+            startActivity(openNoteInEditor);
+        }
+
+        if (type=="audio"){
+            Intent openMemoPlayer = new Intent(this, AudioPlayerActivity.class);
+            openMemoPlayer.putExtra("id",id);
+            startActivity(openMemoPlayer);
+        }
 
     }
 
     //Löscht alle Notizen
+    //später ersetzen durch Reset-Knopf in Einstellungen
     private void clear() {
         noteList.clear();
         updateNoteListView();
-        lastId = 0;
+        lastNoteId = 0;
+        lastMemoId = 0;
 
         File notesDir = new File(getFilesDir(),"notes");
         if (notesDir.exists()){
@@ -209,8 +250,17 @@ public class MainActivity extends AppCompatActivity {
 
     //erstellt ein Item in der ListView entsprechend der gerade erstellten Notiz
     private void createNoteListItem(String title, String type) {
-        lastId++;
-        int id = lastId;
+        String id="";
+
+        if (type=="text"){
+            lastNoteId++;
+            id="note"+lastNoteId;
+        }
+        else if (type=="audio"){
+            lastMemoId++;
+            id="memo"+lastNoteId;
+        }
+
 
         if(Arrays.asList(noteList.getTitles()).contains(title)){                //Damit Titel eindeutig sind
             title=title+" ";                                                    //Aber keinen Einfluss auf Inhalt der Notiz
@@ -222,7 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Speichert Datei mit allen bei Neustart relevanten Daten (lastId und Titel der Notizen)
+    private void editNoteListItem(String title,String id){
+        noteList.edit(title,id);
+
+        updateNoteListView();
+    }
+
+    //Speichert Datei mit allen bei Neustart relevanten Daten (lastIds und Titel der Notizen)
     private void save() {
         String data, noteTitleAndTypeString = "";
 
@@ -237,14 +293,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (FileNotFoundException e) {
         }
 
-        for (int i = 0; i < lastId; i++) {
+        for (int i = 0; i < lastNoteId+lastMemoId; i++) {
             noteTitleAndTypeString = noteTitleAndTypeString + noteList.getTitles()[i] + ","+
                                      noteList.getTypes()[i]+"\n";
         }
 
-        data = "lastId:\n"
-                + lastId + "\n" +
-                "noteTitles\n" +
+        data = "notes\n" +
                 noteTitleAndTypeString;
 
         try {
@@ -254,9 +308,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //lädt Datei mit allen bei Neustart relevanten Daten (lastId und Titel der Notizen)
+    //lädt Datei mit allen bei Neustart relevanten Daten (lastIds und Titel der Notizen)
     private void load() {
         String readLine = "";
+        lastNoteId=0; lastMemoId=0;
 
         InputStream LoadS = null;
         try {
@@ -269,11 +324,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {                                                            //Auslesen
             while ((readLine = LoadBR.readLine()) != null) {
-                if (readLine.contains("lastId")) {                    //lastId auslesen
-                    lastId = Integer.valueOf(LoadBR.readLine());
-                }
-                if (readLine.contains("noteTitles")) {                    //Notizliste auslesen
-                    for (int i = 0; i < lastId; i++) {
+
+                if (readLine.contains("notes")) {                    //Notizliste auslesen
+                    for (int i = 0; i < lastNoteId+lastMemoId; i++) {
                         String title="", type="", character;
                         int j=0;
 
@@ -287,9 +340,14 @@ public class MainActivity extends AppCompatActivity {
 
                         if (String.valueOf(readLine.charAt(j)).equals("t")){
                             type="text";
-                        } else {type="audio";}
+                            lastNoteId++;
+                            noteList.add("note"+lastNoteId,title,type);
+                        } else {
+                            type="audio";
+                            lastMemoId++;
+                            noteList.add("memo"+lastMemoId,title,type);
+                        }
 
-                        noteList.add(i + 1, title,type);
                     }
                 }
             }

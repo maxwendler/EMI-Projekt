@@ -27,7 +27,7 @@ public class NoteEditorActivity extends AppCompatActivity{
 
     private EditText tfContent;
 
-    private int id;
+    private String id;
 
     private String state;
 
@@ -45,7 +45,7 @@ public class NoteEditorActivity extends AppCompatActivity{
         tfContent= (EditText) findViewById(R.id.editTextContent);
 
         Intent fromMain=getIntent();
-        id = fromMain.getIntExtra("id", 0);
+        id = fromMain.getStringExtra("id");
         state="new note";                                   //bleibt oder wird beim Laden verändert
         try {                                               //Laden falls durch Klick auf Notiz geöffnet
             if (fromMain.getType().equals("activator")) {
@@ -80,12 +80,22 @@ public class NoteEditorActivity extends AppCompatActivity{
 
             saveNote(id,content);
             startActivity(backtToMain);
+        } else if (empty==false){                                       //Notizen werden auch nach nachträglicher Veränderung gespeichert
+
+            Intent backToMain = new Intent(this, MainActivity.class);
+            backToMain.setFlags(backToMain.FLAG_ACTIVITY_CLEAR_TOP);
+            backToMain.putExtra("title",content);
+            backToMain.putExtra("id",id);
+            backToMain.setType("changed text");
+
+            saveNote(id,content);
+            startActivity(backToMain);
         }
     }
 
 
     //Darfst du so verändern wie du willst Fabian, ist unabhängig vom Rest
-    private void saveNote(int id,String text){
+    private void saveNote(String id,String text){
 
         File notesDir= new File(getFilesDir(),"notes");                 //Ordner, wird einmalig erstellt
         if (!(notesDir.exists())){
@@ -94,9 +104,13 @@ public class NoteEditorActivity extends AppCompatActivity{
                 }catch (SecurityException e){}
         }
 
-        File noteTxt= new File(notesDir,String.valueOf(id)+".txt");     //Datei
+        File noteTxt= new File(notesDir,id+".txt");     //Datei
+        if (noteTxt.exists()){
+            noteTxt.delete();
+        }
         try{
             noteTxt.createNewFile();
+            System.out.println("Saved as "+id+".txt");
         }catch (IOException e){}
 
 
@@ -118,7 +132,7 @@ public class NoteEditorActivity extends AppCompatActivity{
 
         InputStream LoadS = null;
         try {
-            LoadS = new FileInputStream(getFilesDir()+"/notes/"+String.valueOf(id)+".txt");
+            LoadS = new FileInputStream(getFilesDir()+"/notes/"+id+".txt");
         } catch (FileNotFoundException e) {System.out.println("File not found");
         }
 
