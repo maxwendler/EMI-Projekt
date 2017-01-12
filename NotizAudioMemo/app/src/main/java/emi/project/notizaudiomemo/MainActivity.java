@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
 
     //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Datei automatisch (lastId+1)
     //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Für Typ seperat
-    private int lastNoteId,lastMemoId;
+    private int lastNoteId,lastAudioId;
 
     private File mainDataTxt;
     private NoteArray noteList;
@@ -62,21 +62,31 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
 
         drawer.closeDrawers();  //Main startet & resumed mit geschlossenem Drawer
 
-        Intent receivedNoteTitle = getIntent();             //Notiz"titel" vom Editor empfangen
+        Intent receivedIntent = getIntent();             //Notiz"titel" vom Editor empfangen
 
         try {
-            if (receivedNoteTitle.getType().equals("text")) {       //Neue Notiz
-                createNoteListItem(receivedNoteTitle.getStringExtra("title"),"text");
-                receivedNoteTitle.setType(null);
+            if (receivedIntent.getType().equals("text")) {       //Neue Notiz
+                createNoteListItem(receivedIntent.getStringExtra("title"),"text");
+                receivedIntent.setType(null);
             }
-            else if(receivedNoteTitle.getType().equals("changed text")){    //Bearbeitete Notiz
-                editNoteListItem(receivedNoteTitle.getStringExtra("title"),
-                                   receivedNoteTitle.getStringExtra("id"));
-                receivedNoteTitle.setType(null);
+            else if(receivedIntent.getType().equals("changed text")){    //Bearbeitete Notiz
+                editNoteListItem(receivedIntent.getStringExtra("title"),
+                                   receivedIntent.getStringExtra("id"));
+                receivedIntent.setType(null);
             }
-            else if(receivedNoteTitle.getType().equals("audio")){           //Memo
-                createNoteListItem(receivedNoteTitle.getStringExtra("title"),"audio");
-                receivedNoteTitle.setType(null);
+            else if(receivedIntent.getType().equals("audio")){           //Audio
+                //Dialogfenster mit Eingabe des Titels
+                int id= lastAudioId+1;
+
+                Intent startAudioTitleActivity = new Intent(this,AudioTitleActivity.class);
+                startAudioTitleActivity.putExtra("id","audio"+id);
+                startActivity(startAudioTitleActivity);
+
+                receivedIntent.setType(null);
+
+            }else if (receivedIntent.getType().equals("audio title")){
+                createNoteListItem(receivedIntent.getStringExtra("title"),"audio");
+                receivedIntent.setType(null);
             }
         } catch (NullPointerException e) {
         }
@@ -124,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
             load();
         } else {
             lastNoteId = 0;
-            lastMemoId = 0;
+            lastAudioId = 0;
         }
 
         //Drawer mit Items füllen
@@ -188,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
     public void onDialogPositiveClick(DialogFragment dialog) {
 
         Intent openAudioRecorder = new Intent(this, AudioRecorderActivity.class);
-        int id=lastMemoId+1;
-        openAudioRecorder.putExtra("id","memo"+id);
+        int id=lastAudioId+1;
+        openAudioRecorder.putExtra("id","audio"+id);
         startActivity(openAudioRecorder);
 
     }
@@ -209,9 +219,9 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         }
 
         if (type=="audio"){
-            Intent openMemoPlayer = new Intent(this, AudioPlayerActivity.class);
-            openMemoPlayer.putExtra("id",id);
-            startActivity(openMemoPlayer);
+            Intent openAudioPlayer = new Intent(this, AudioPlayerActivity.class);
+            openAudioPlayer.putExtra("id",id);
+            startActivity(openAudioPlayer);
         }
 
     }
@@ -222,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         noteList.clear();
         updateNoteListView();
         lastNoteId = 0;
-        lastMemoId = 0;
+        lastAudioId = 0;
 
         File notesDir = new File(getFilesDir(),"notes");
         if (notesDir.exists()){
@@ -257,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
             id="note"+lastNoteId;
         }
         else if (type=="audio"){
-            lastMemoId++;
-            id="memo"+lastNoteId;
+            lastAudioId++;
+            id="audio"+lastAudioId;
         }
 
 
@@ -283,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         String data, noteTitleAndTypeString = "";
 
         try {
+            if (mainDataTxt.exists()){mainDataTxt.delete();}
             mainDataTxt.createNewFile();
         } catch (IOException e) {
         }
@@ -293,13 +304,18 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         } catch (FileNotFoundException e) {
         }
 
-        for (int i = 0; i < lastNoteId+lastMemoId; i++) {
+        for (int i = noteList.getTitles().length-1; i >= 0; i--) {
             noteTitleAndTypeString = noteTitleAndTypeString + noteList.getTitles()[i] + ","+
                                      noteList.getTypes()[i]+"\n";
         }
 
-        data = "notes\n" +
+
+
+        data =  "itemCount\n"+
+                noteList.getTitles().length+"\n"+
+                "notes\n" +
                 noteTitleAndTypeString;
+
 
         try {
             writer.write(data.getBytes());
@@ -311,7 +327,8 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
     //lädt Datei mit allen bei Neustart relevanten Daten (lastIds und Titel der Notizen)
     private void load() {
         String readLine = "";
-        lastNoteId=0; lastMemoId=0;
+        lastAudioId=0;lastNoteId=0;
+        int itemCount=0;
 
         InputStream LoadS = null;
         try {
@@ -325,8 +342,13 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         try {                                                            //Auslesen
             while ((readLine = LoadBR.readLine()) != null) {
 
-                if (readLine.contains("notes")) {                    //Notizliste auslesen
-                    for (int i = 0; i < lastNoteId+lastMemoId; i++) {
+                if(readLine.contains("itemCount")){
+                    itemCount=Integer.valueOf(LoadBR.readLine());
+                }
+
+                if (readLine.contains("notes")) {
+                    //Notizliste auslesen
+                    for (int i = 0; i < itemCount; i++) {
                         String title="", type="", character;
                         int j=0;
 
@@ -344,8 +366,8 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
                             noteList.add("note"+lastNoteId,title,type);
                         } else {
                             type="audio";
-                            lastMemoId++;
-                            noteList.add("memo"+lastMemoId,title,type);
+                            lastAudioId++;
+                            noteList.add("audio"+lastAudioId,title,type);
                         }
 
                     }
