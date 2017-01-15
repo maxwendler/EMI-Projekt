@@ -64,7 +64,6 @@ public class AudioRecorderActivity extends FragmentActivity {
                 if (isRecording==false){
                     startRecording();
                 }else if (isRecording==true){
-                    bRecord.setText("AUFNAHME");
                     stopRecording();
                 }
             }
@@ -129,6 +128,8 @@ public class AudioRecorderActivity extends FragmentActivity {
         recorder.release();
         recorder = null;
         isRecording=false;
+
+        finish();
 
     }
 }

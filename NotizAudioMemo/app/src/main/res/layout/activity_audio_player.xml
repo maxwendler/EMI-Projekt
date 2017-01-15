@@ -15,6 +15,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar_playback" />
+        android:id="@+id/progressBar_playback"
+        android:clickable="false" />
 
 </LinearLayout>
