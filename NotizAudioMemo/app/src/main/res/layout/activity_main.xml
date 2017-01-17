@@ -13,7 +13,12 @@
 
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ListViewFavorites" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/ListViewNotes" />
 
         <android.support.design.widget.FloatingActionButton
@@ -37,6 +42,7 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <!-- Das nicht! -->
+
     <ListView android:id="@+id/left_drawer"
         android:layout_height="match_parent"
         android:layout_gravity="left"

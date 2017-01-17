@@ -16,11 +16,13 @@ public class NoteArray {
     private String [] ids;
     private String [] titles;
     private String [] types;
+    private String [] items;
 
     public NoteArray(){
         ids=new String[0];
         titles= new String[0];
         types= new String[0];
+        items= new String[0];
     }
 
     public String [] getIds(){
@@ -32,6 +34,8 @@ public class NoteArray {
     }
 
     public String[] getTypes() {return types;}
+
+    public String[] getItems() {return items;}
 
     public String getIdByTitle (String title){
         int index=0;
@@ -82,6 +86,7 @@ public class NoteArray {
     public void clear(){
         ids=new String[0];
         titles=new String[0];
+        items=new String[0];
     }
 
     //fügt neues Element am Index 0 hinzu, verschiebt den Rest nach hinten
@@ -89,25 +94,34 @@ public class NoteArray {
         String[] a=ids;
         String[] b=titles;
         String[] c=types;
+        String[] d=items;
 
         ids= new String[a.length+1];
         titles= new String[b.length+1];
         types= new String[c.length+1];
+        items=new String[d.length+1];
 
         for (int i=0;i<a.length;i++){
             ids[i+1]=a[i];
             titles[i+1]=b[i];
             types[i+1]=c[i];
+            items[i+1]=d[i];
         }
 
         ids[0]=id;
         titles[0]=title;
         types[0]=type;
+        items[0]=type+","+title;
     }
 
     public void edit(String title, String id){
         int i= Arrays.asList(ids).indexOf(id);
         titles[i]=title;
+        items[i]=types[i]+","+title;
+    }
+
+    public void move (String id){
+
     }
 
     public void delete(){

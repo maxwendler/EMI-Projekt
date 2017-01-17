@@ -2,17 +2,22 @@ package emi.project.notizaudiomemo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,21 +36,22 @@ import java.util.List;
  * Created by Max on 15.12.2016.
  */
 
-public class MainActivity extends AppCompatActivity implements NoteTypeDialogFragment.NoticeDialogListener {
+public class MainActivity extends AppCompatActivity
+        implements NoteTypeDialogFragment.NoticeDialogListener, FavorizeClicked{
 
     private FloatingActionButton btNewNote;
     private Button btClear;
     private DrawerLayout drawer; //der Drawer an sich
     private ListView drawerList; //die Liste der Items darin
-    private ListView noteListView;
+    private ListView noteListView,favoritesListView;
 
     //Folgende Variable zählt die Anzahl der Notizen, so dass jede neue Datei automatisch (lastId+1)
     //als ID erhalten kann, damit sie adäquat gespeichert werden kann. Für Typ seperat
     private int lastNoteId,lastAudioId;
 
     private File mainDataTxt;
-    private NoteArray noteList;
-    private ArrayAdapter<String> noteListViewAdapter;
+    private NoteArray noteList,favoritesList;
+    private NoteListArrayAdapter noteListViewAdapter,favoritesListViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
 
         drawerList = (ListView) findViewById(R.id.left_drawer);
         noteListView = (ListView) findViewById(R.id.ListViewNotes);
+        favoritesListView= (ListView) findViewById(R.id.ListViewFavorites);
 
         drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
 
@@ -126,7 +133,9 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
 
 
         noteList = new NoteArray();
-        noteListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, noteList.getTitles());
+        favoritesList=new NoteArray();
+        noteListViewAdapter = new NoteListArrayAdapter(this,noteList.getItems(),this);
+        favoritesListViewAdapter= new NoteListArrayAdapter(this,favoritesList.getItems(),this);
 
         //Datei wird geladen, wenn sie existiert
         mainDataTxt = new File(getFilesDir(), "mainData.txt");
@@ -172,7 +181,10 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
         noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openNote(parent.getItemAtPosition(position).toString());
+                Log.e("OnItemClickListener","item clicked");
+
+                TextView tvTitle = (TextView) view.findViewById(R.id.textView_title);
+                openNote(tvTitle.getText().toString());
             }
         });
     }
@@ -381,9 +393,23 @@ public class MainActivity extends AppCompatActivity implements NoteTypeDialogFra
 
     //aktualisiert Notizliste
     private void updateNoteListView() {
-        noteListViewAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, noteList.getTitles());
+        noteListViewAdapter = new NoteListArrayAdapter(this, noteList.getItems(),this);
         noteListView.setAdapter(noteListViewAdapter);
     }
+    @Override
+    public void moveNoteListItem (int position){
+        Log.e("MainActivity","Sucessful callback,"+" position " + position);
+        View item = (View) noteListView.getChildAt(position);
+        ToggleButton bFavorize = (ToggleButton) item.findViewById(R.id.button_favorize);
+        TextView tvTitle = (TextView) item.findViewById(R.id.textView_title);
+        String id;
 
+        if (!bFavorize.isChecked()){
+            Log.e("ButtonFavorize","unchecked");
+            id=noteList.getIdByTitle(tvTitle.getText().toString());
+            //favoritesList.add(noteList.move(id));
+
+        }else{Log.e("ButtonFavorize","checked");}
+    }
 }
 
