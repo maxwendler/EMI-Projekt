@@ -1,0 +1,498 @@
+﻿= Pflichtenheft - Artistenverein
+:toc: macro
+Gruppe 18 - Artistenverein
+
+toc::[]
+Dies ist das Pflichtenheft, welches zwischen dem Artistenverein und der Gruppe 18 als Grundlage eines beauftragten Webprojekts die Konditionen und Anforderungen des Projekts festlegt.
+
+== Änderungshistorie
+
+
+[options="header"]
+[cols="1, 1, 1, 1, 4"]
+|===
+|Version | Status      | Bearbeitungsdatum   | Autoren(en) |  Vermerk
+|0.1     | In Arbeit   | 13.10.2017          | FriwiDev      | Initiale Version
+|===
+
+== Aufgabenstellung und Zielsetzung
+
+=== Aufgabenstellung
+
+Der Artistenverein „Funkenschlag“ besteht aus mehreren Feuerkünstlern und Jongleuren verschiedenster Art. Diese bieten sowohl zweistündige oder mehrtägige Workshops als auch zweistündige Shows für Veranstaltungen an und benötigen hierzu eine Verwaltung ihrer Termine.
+
+Es soll dabei eine Datenbank aufgebaut werden, in der die einzelnen Artisten und Artistengruppen mit ihren Angeboten gespeichert werden können. Shows dieser Gruppen haben feste Besetzungen. Eine Gruppe hat nur eine aktuelle Show. Aus dieser Datenbank sollen dann über das Internet Shows und Workshops buchbar sein. Buchungen sind maximal ein Monat im voraus möglich. Kunden können das Angebot nach Artistenkategorien durchsuchen. Für die Buchung benötigt man ein Kundenkonto. Wichtig ist, dass wenn ein Artist verbucht ist, dass dann auch Gruppenshows, in denen er sonst teilnimmt, nicht mehr buchbar sind. Da viele die Shows nur als zusätzliche Einnahmequelle neben ihrer normalen Beschäftigung nutzen, muss die Möglichkeit bestehen, Sperrzeiten zu vermerken. 
+
+Für die Verwaltung der Showbuchungen, Kunden und Artistendatenbank muss ein einfaches System implementiert werden, welches nur den Artisten zugänglich ist. Hierbei sieht jeder Artist nach dem Einloggen nur seine eigenen Kunden, mit Name und Adresse, Shows, etc. Dem Vorstand des Vereins soll sich hingegen eine Zusammenfassung über alle Veranstaltung präsentieren. Er hat den Adminzugang und erstellt Artistengruppen.
+
+Workshops können in der vereinseigenen Halle abgehalten werden oder außerhalb. Bei Workshops außerhalb müssen die Kosten für Anfahrt, Verpflegung und Unterbringung vom Kunden übernommen werden, diese bilden eine Aufwandspauschaule. Shows finden nur in der Halle statt. 
+
+Zusätzlich zur Verwaltung der Shows und Workshops soll noch ein kleiner Shop unterhalten werden. Hier werden einige Utensilien zum Jonglieren verkauft, welche mit 5-Sterne-System bewertet werden können. Unter anderem Feuerstäbe, Pois, Jonglierbälle und Diabolos. Workshopteilnehmern soll ein Rabatt auf alle Shopartikel eingeräumt werden. Dieser gilt ab Buchung bis 1 Woche nach dem Veranstaltungstermin. Sämtliche Bezahlvorgänge finden in bar statt.
+
+=== Zielsetzung
+
+Ziel des Projekts ist die Erstellung einer Webapplikation, welche eine Datenbank enthält. Diese Datenbank erfasst Daten von Kunden und Artisten sowie Veranstaltungen und Buchungen. Buchungen werden durch ein Buchungssystem verwaltet. Zusätzlich werden in einem Webshop weitere Artikel angeboten.
+
+== Produktnutzung
+In welchem Kontext soll das System später genutzt werden? Welche Rahmenbedingungen gelten?
+Zusätzlich kurze Einleitung für fachfremde Personen
+
+== Interessensgruppen (Stakeholders)
+
+In erster Linie stehen die Anforderungen des Auftraggebers (Vorstand) im Vordergrund.
+Weiterhin werden die Untergeordneten des Vorstandes (Artisten) eine wichtige Rolle in der Analysephase spielen.
+Darüber hinaus müssen Anforderungen aus der Sicht eines potenziellen Kunden des Artistenvereins an das System gestellt werden. 
+
+== Systemgrenze und Top-Level-Architektur
+
+=== Kontextdiagramm
+Das Kontextdiagramm zeigt das geplante Software-System in seiner Umgebung. Zur Umgebung gehören alle Nutzergruppen des Systems und Nachbarsysteme. Die Grafik kann auch informell gehalten sein. Überlegen Sie sich dann geeignete Symbole. Die Grafik kann beispielsweise mit Visio erstellt werden. Wenn nötig, erläutern Sie diese Grafik.
+
+image:models/analysis/Kontextdiagramm.jpg[Kontextdiagramm]
+
+=== Top-Level-Architektur
+Dokumentieren Sie ihre Top-Level-Architektur mit Hilfe eines Komponentendiagramm.
+
+image:models/analysis/Top-Level-Architektur-v3.jpg[Top-Level-Architektur]
+
+== Anwendungsfälle
+
+=== Akteure
+
+Akteure sind die Benutzer des Software-Systems oder Nachbarsysteme, welche darauf zugreifen. Dokumentieren Sie die Akteure in einer Tabelle. Diese Tabelle gibt einen Überblick über die Akteure und beschreibt sie kurz. Die Tabelle hat also mindestens zwei Spalten (Akteur Name und Kommentar).
+Weitere relevante Spalten können bei Bedarf ergänzt werden.
+
+// See http://asciidoctor.org/docs/user-manual/#tables
+[options="header"]
+[cols="1,4"]
+|===
+|Name |Beschreibung
+|Nutzer  |Als Nutzer zählt jeder, der die Webapplikation benutzt. Alle anderen Nutzerformen erben von diesem Akteur.
+|Nicht-Eingeloggter Nutzer  | Dieser Akteur erbt vom Nutzer und jeder User, der die Website aufruft, ist zuerst als dieser Akteur klassifiziert. Er hat eingeschränkte Rechte.
+|Eingeloggter Nutzer  | Dieser Akteur erbt direkt vom Nutzer. User sind als dieser Akteur klassifiziert, wenn sie sich als Nicht-Eingeloggter Nutzer registrieren bzw. einloggen.
+|Artist | Dieser Akteur erbt vom Eingeloggten Nutzer. Zu ihm gehören alle Mitglieder des Vereins. Sie sind teil der Veranstaltungen und und bieten diese an. 
+|Vorstand | Dieser Akteur erbt vom Eingeloggten Nutzer. Er ist der Vorstand des Artistenverein und hat die Administrator-Rechte.
+|Kunde  | Dieser Akteur erbt vom Eingeloggten Nutzer. Jeder User, der nicht ein Mitglied des Vereins ist, ist ein Kunde. Er hat die Möglichkeit, mit dem Shop zu interagieren. 
+|===
+
+=== Überblick Anwendungsfalldiagramm
+Anwendungsfall-Diagramm, das alle Anwendungsfälle und alle Akteure darstellt
+
+image:models/analysis/Anwendungsfalldiagramm.jpg[Anwendungsfalldiagramm]
+
+=== Anwendungsfallbeschreibungen
+Dieser Unterabschnitt beschreibt die Anwendungsfälle. In dieser Beschreibung müssen noch nicht alle Sonderfälle und Varianten berücksichtigt werden. Schwerpunkt ist es, die wichtigsten Anwendungsfälle des Systems zu finden. Wichtig sind solche Anwendungsfälle, die für den Auftraggeber, den Nutzer den größten Nutzen bringen.
+Für komplexere Anwendungsfälle ein UML-Sequenzdiagramm ergänzen.
+Einfache Anwendungsfälle mit einem Absatz beschreiben.
+Die typischen Anwendungsfälle (Anlegen, Ändern, Löschen) können zu einem einzigen zusammengefasst werden.
+
+"Artikel ansehen" und "Artikel suchen" kann vom Nutzer Akteur benutzt werden, um sich das Angebot im Artikelshop anzusehen und zu durchsuchen. Der Nutzer ruft den Artikelshop auf und kann dort über ein Suchfeld nach Artikeln suchen woraufhin ihm Angebote angezeigt werden und er kann sich einen Artikel genauer ansehen in dem er auf "Artikel ansehen" klickt bei dem jeweiligen Artikel.
+
+"Veranstaltungsangebote ansehen" ist ebenfalls ein Fall, der vom Nutzer-Akteur benutzt wird. Jeder Nutzer kann sich alle Veranstaltungen ansehen. Hier ruft der Nutzer den Veranstaltungskatalog auf und bekommt eine Übersicht über alle Veranstaltungen.
+
+Diese 3 Fälle stehen jedem Nutzer zur Verfügung und benötigen keine weitere Zugangsberechtigung. 
+
+"Registrieren" und "Einloggen" können vom Nicht-Eingeloggten Nutzer benutzt werden, um sich Zugang zum beschränkten Bereich der Website zu verschaffen. "Registrieren" legt ein Nutzerkonto in der Datenbank an, das einer der drei von Eingeloggter Nutzer erbenden Klassen enstpricht. Anschließend ist der Nutzer sofort eingeloggt. "Einloggen" lässt einen Nutzer über seinen Account auf den eingeschränkten Bereich der Website zugreifen. Die eingegebenen Daten des Benutzers werden von der Datenbank verifiziert und anschließend wird eine Instance für den Benutzer erstellt. 
+
+Artisten können "Eigene Veranstaltungen einsehen" verwenden, um sich einen Überblick zu den Veranstaltungen und Workshops, in denen sie teilnehmen oder die sie erstellt haben, zu verschaffen. Nach dem Aufrufen der Funktion, werden die Daten der Veranstaltungen, in denen er beteiligt ist, von der Datenbank geholt. 
+
+Artisten können "Veranstaltungen erstellen" verwenden um Workshops oder andere Veranstaltungen für Gruppen zu erstellen. Diese können dann von Kunden gefunden und gebucht werden. Ein Artist erstellt eine Veranstaltung, deren Informationen auf Richtigkeit geprüft werden. Wenn alles korrekt ist, wird die Veranstaltung zum Veranstaltungskatalog hinzugefügt und anschließend noch der Datenbank hinzugefügt. 
+
+Artisten können "Veranstaltung bearbeiten" um ihre Veranstaltungen zu editieren. Dazu zählt zum Beispiel Veranstaltungen löschen etc. Die Veranstaltungen werden von der Datenbank geholt, und die Änderungen werden verifiziert, zurückgeschickt und gespeichert.
+
+Außerdem können Artisten "Sperrzeiten eintragen", zu denen sie nicht gebucht werden können. Diese Sperrzeiten sind frei wählbar. Analog zu Sperrzeiten "sperren" auch Termine die Buchung. Diese Sperrzeiten werden verifiziert, und im Kalender eingetragen, der diese Daten dann in der Datenbank speichert.
+
+Kunden können "Artikel kaufen" benutzen um, Artikel, die sie in den Warenkorb gelegt haben, zu kaufen. Die Informationen bezüglich des Kaufs (Käuferinformationen und Artikelinformationen) werden in der Datenbank gespeichert. Da keine Online-Bezahlmöglichkeiten gegeben sind, wird der Artikel bei der Lieferung gezahlt. Deshalb hat das System bei der Bezahlung keine weiteren Operationen.
+
+Kunden können "Artikel in den Warenkorb legen", wenn sie im Shop einen Artikel gefunden haben, den sie kaufen wollen. Sie klicken auf einen dafür spezifizierten Button. Daraufhin werden alle Artikelinformationen von der Datenbank geholt und bereitgehalten. Der Artikel wird dann in die Warenkorbinstance des Kundens gespeichert. Von hier stehen dem Kunden dann weitere Optionen zur Verfügung.
+
+Kunden können aus dem Veranstaltungskatalog "Veranstaltungen Buchen". Diese kommen nicht in den Warenkorb, sondern werden direkt gebucht. Dazu zählen Workshops und Gruppenshows. Bei der Buchung werden die Daten der Veranstaltungen von der Datenbank geholt, anschließend wird die Buchung mit den Kundendaten des Kunden der sie gebucht hat in der Datenbank gespeichert. Bezahlung dieser
+Veranstaltung erfolgt ebenfalls nicht über eine Online-Bezahlmöglichkeit.
+
+Außerdem können Kunden "Veranstaltungen Bewerten und Kommentieren". Das können sie nur, wenn sie auch an einer Veranstaltung teilgenommen haben. Die bestbewertetsten Veranstaltungen werden dem Nutzer in verschiedenen Website-Ansichten empfohlen. Die Veranstaltung wird von der Datenbank abgerufen und ihr wird ein Kommentar hinzugefügt, oder eine Bewertung. Diese werden dann in der Datenbank gespeichert. Zusätzlich wird die Bewertung zur Gesamtbewertung der Veranstaltung miteingerechnet (durchschnittliche Bewertung).
+
+Der Vorstand kann "Allgemeine Sperrzeiten eintragen" in denen Artisten und Artistengruppen nicht auftreten können. Dies wird über den Kalender eingetragen und von dort in der Datenbank gespeichert.
+
+Der Vorstand kann "Angebote und Buchungen Abrufen" um sich einen Überblick über alle Veranstaltungen und Workshops zu verschaffen. Dadurch sieht er immer, was gebucht wurde. Hier sendet er einen Befehl an den Server, der dann von der Datenbank alle Informationen abruft, die mit Angeboten und Buchungen zu tun haben. Diese werden ihm dann angezeigt und sind nicht editierbar.
+
+Der Vorstand kann "Artikel bestellen" wenn es nicht mehr genug von einem Artikel im Inventar gibt oder wenn neue Artikel bestellt wurden. Falls es sich um eine Nachbestellung eines Artikels aufgrund ungenügender Stückzahl handelt, sendet der Vorstand eine Anfrage nach dem Artikel in der Datenbank und bekommt alle dies bezüglichen Informationen. Anschließend ist es möglich das Inventar durch 
+eine dritte Partei, den Lieferanten, zu erhöhen. Die Informationen des neuen Bestandes werden dann in der Datenbank gespeichert. Bei einem neuen Artikel wird ein Eintrag in der Datenbank erstellt, nachdem alle Artikelinformationen verifiziert wurden. 
+
+Der Vorstand kann außerdem "Artikel verwalten" um Artikelinformationen auf der Website zu ändern oder Artikel aus dem Shop zu löschen, oder neue hinzuzufügen. Dies geschieht durch eine Anfrage nach dem Artikel in der Datenbank. Die Datenbank liefert dann den Artikel und dem Vorstand ist es möglich Informationen bezüglich des Artikels zu ändern. Diese Informationen werden dann verifiziert und in der Datenbank gespeichert. Dem Vorstand ist es außerdem möglich einen Artikel aus der Datenbank zu löschen, dazu sendet der Vorstand zunächst ebenfalls eine Anfrage nach dem Artikel und gibt den Befehl den Artikel zu löschen. Das wird dann verifiziert und die Datenbank
+wird dem ensprechend verändert. Der Artikel wird dann ebenfalls auch aus dem Artikelshop entfernt. Des Weiteren kann der Vorstand neue Artikel zur Datenbank hinzufügen in dem er ein Formular ausfüllt mit den Daten des Artikels. Diese Informationen werden dann verifiziert und falls alles korrekt ist, wird der Artikel der Datenbank hinzugefügt.
+
+Der Vorstand kann das "Inventar verwalten", um zu sehen, wieviel Stück von einem Artikel noch im Inventar ist, sowie neue "Artikel bestellen". In diesem Fall muss er die Artikelanzahl erhöhen. Das Inventar wird ebenfalls von der Datenbank abgerufen und Der Vorstand hat die Möglichkeit einen Artikel konkret im Inventar zu wählen und zu bearbeiten.
+
+Der Vorstand kann "Artisten verwalten" verwenden um neue Artisten hinzuzufügen oder sie zu löschen. Falls der Vorstand einen Artisten löschen möchte, sendet er eine Anfrage an die Datenbank nach den Informationen des entsprechenden Artisten. Anschließend gibt er den Befehl den Eintrag des Artisten zu löschen. Das wird verifiziert und dann wird die Datenbank dementsprechend geändert. Falls der 
+Vorstand einen Artisten hinzufügen möchte, füllt er ein Formular aus, dessen Daten verifiziert werden und anschließend zur Datenbank gesendet werden um als ein Eintrag gespeichert zu werden.
+
+Des Weiteren kann der Vorstand "Gruppen verwalten", zu denen mehrere Artisten zählen. Es können neue Gruppen erstellt und Gruppen gelöscht werden. Wenn der Vorstand eine Gruppe löschen möchte, sendet er eine Anfrage nach einer speziellen Gruppe an die Datenbank, die dann die gruppenbezüglichen Informationen sendet. Der Vorstand löscht dann die Gruppe, diese Aktion wird verifiziert und die Gruppe wird aus der Datenbank gelöscht. Des Weiteren werden alle Veranstaltung assoziiert mit dieser Gruppe aus dem Veranstaltungskatalog gelöscht. Falls der Vorstand eine Gruppe erstellen will, füllt er ein Formular aus, dessen Informationen verifiziert werden und anschließend, falls dies erfolgreich war, in die Datenbank gespeichert wird.
+
+Und Der Vorstand kann sich eine "Finanzübersicht anzeigen" lassen, die ähnlich wie "Angebote und Buchungen Abrufen" funktioniert. Hier finden sich die Informationen bezüglich des Shops und der Finanzen des Vereins. Der Vorstand sendet eine Anfrage an das System, die von der Datenbank alle finanzbezüglichen Informationen zurückgibt. Diese werden dem Vorstand dann, nicht editierbar, angezeigt.
+
+== Funktionale Anforderungen
+
+=== Muss-Kriterien
+Was das zu erstellende Programm auf alle Fälle leisten muss.
+
+=== Kann-Kriterien
+Anforderungen die das Programm leisten können soll, aber für den korrekten Betrieb entbehrlich sind.
+
+
+== Nicht-Funktionale Anforderungen
+
+Zugänglichkeit: Das System ist für jede Person nutzbar, welche einen Computer mit Internetverbindung besitzt.
+
+Zuverlässigkeit: Alle von Nutzern eingegebenen Daten können fehlerhaft sein und dürfen das System nicht beeinträchtigen.
+
+Fehlertoleranz: Änderungen an fälschlicherweise eingegebenen Daten sollen schnell und einfach ermöglicht sein.
+
+Verständlichkeit: Die Weboberfläche wird zu allen Nutzerfunktionen Buttons und Hyperlinks 
+
+Bedienbarkeit: Jeder Nutzer kann die Web-Applikation vollständig mit einer Maus und Tastatur bedienen.
+
+Wiederherstellbarkeit: Alle Account Daten sowie Veranstaltungen mit getätigten Buchungen und Käufe werden in einer Datenbank gespeichert. Bei unerwarteten kompletten Systemabstürzen können alle gespeicherten Daten von einem Backup wiederhergestellt werden.
+
+Wartung: Änderungen am gesamten System soll ausschließlich dem Fachpersonal (in dem Falle eventuell der Vorstand) möglich sein. Das Programm wird in verschiedene Komponenten gegliedert, welche das Bearbeiten von einzelnen Bereichen erlaubt. 
+
+Prüfbarkeit: Alle Funktionen können mit wenigen Eingaben schnell an einem Rechner überprüft werden.
+
+Sicherheit: Das Einsehen von Kundendaten soll nur authorisierten Personen (der Kunde selbst oder der Vorstand) möglich sein.
+
+Erscheinungsbild: Die Weboberfläche wird ein einfaches intiutives Design haben, welches geläufigen Webseiten ähnelt. *Siehe GUI*
+
+Ausmaß: Das System sollte in der Lage sein, hunderte Nutzer zur gleichen Zeit bedienen zu können.
+
+Geschwindigkeit: Alle Vorgänge sollen wenige Sekunden brauchen, um abgeschlossen zu werden.
+
+
+=== Qualitätsziele
+
+Dokumentieren Sie in einer Tabelle die Qualitätsziele, welche das System erreichen soll, sowie deren Priorität.
+
+=== Konkrete Nicht-Funktionale Anforderungen
+
+Beschreiben Sie Nicht-Funktionale Anforderungen, welche dazu dienen, die zuvor definierten Qualitätsziele zu erreichen.
+Achten Sie darauf, dass deren Erfüllung (mindestens theoretisch) messbar sein muss.
+
+== GUI Prototyp
+
+
+image:models/analysis/mock_ups/Startseite.jpg[Startseite]
+ 
+ 
+image:models/analysis/mock_ups/Shop.jpg[Shop]
+ 
+ 
+image:models/analysis/mock_ups/Artikelansicht.jpg[Artikelansicht]
+ 
+
+image:models/analysis/mock_ups/Warenkorb.jpg[Warenkorb]
+ 
+ 
+image:models/analysis/mock_ups/Veranstaltungsansicht.jpg[Veranstaltungsansicht]
+ 
+ 
+image:models/analysis/mock_ups/Veranstaltung buchen.jpg[Veranstaltung buchen]
+ 
+ 
+image:models/analysis/mock_ups/Artistenansicht.jpg[Artistenansicht]
+ 
+ 
+  
+=== Überblick: Dialoglandkarte
+ 
+image:models/analysis/mock_ups/Dialoglandkarte.jpg[Dialoglandkarte]
+ 
+  
+=== Dialogbeschreibung
+ 
+Von der Startseite aus kann man über die linke Leiste unter anderem zum Shop für Artikel und Veranstaltungen navigieren.
+Über die gleiche Leiste kann man auch wieder zurück zur Startseite gelangen. In den einzelnen Shops gelangt man zur 
+detailierteren Ansicht des Artikels/der Veranstaltung durch das Anklicken des jeweiligen Artikels/der jeweiligen Veranstaltung.
+Der Warenkorb wird zum ersten Mal aufgerufen, wenn ein Artikel hinzugefügt wurde. Wenn bereits ein Artikel im Warenkorb ist,
+kann man den Warenkorb auch von der Startseite und von der Shopansicht aufrufen (jeweils unten rechts).
+
+Beschließt man sich dazu, eine Veranstaltung zu buchen, öffnet sich eine Art Kalender, in dem man das Datum und die Uhrzeit 
+der Veranstaltung konkretisieren kann. Sollte man sich doch gegen eine Buchung entscheiden, kann man per Hyperlink zurück zur 
+Veranstaltungsansicht wechseln. Hat man jedoch auf einen (freien) Tag geklickt, lässt sich dann eine Uhrzeit eintragen.
+Sofern diese Zeit organisatorisch realisierbar ist, kann man die Buchung dann endgültig abschließen.
+ 
+
+== Datenmodell
+
+=== Überblick: Klassendiagramm
+UML-Analyseklassendiagramm
+
+image:models/analysis/Klassendiagramm.jpg[Klassendiagramm]
+
+=== Klassen und Enumerationen
+Dieser Abschnitt stellt eine Vereinigung von Glossar und der Beschreibung von Klassen/Enumerationen dar. Jede Klasse und Enumeration wird in Form eines Glossars textuell beschrieben. Zusätzlich werden eventuellen Konsistenz- und Formatierungsregeln aufgeführt.
+
+// See http://asciidoctor.org/docs/user-manual/#tables
+[cols="30,70"]
+|===
+|Klasse/Enumeration   		   |Beschreibung 
+|Weboberfläche        		   |Hauptklasse der Anwendung, über die sich Nutzer als Kunde registrieren können. 
+		      		  Die Weboberfläche hat einen Artikelkatalog, Veranstaltungskatalog, ein Inventar, einen Buchungs- und einen Bestellungsmanager. 
+|Nutzer               		   |Oberklasse aller Nutzer mit den Attributen nutzername, passwort, name, vorname, adresse und email, die jeder Nutzeraccount hat. Nutzer können ihr Profil über die entsprechende Methode bearbeiten.        
+|Kunde                		   |Klasse für Kundenaccounts, die von der Nutzer-Klasse erbt. Bei Buchung bzw. Nach Besuchen eines Workshops kann der Rabatt-Status des Accounts vom System geändert werden.
+		       		  Jeder Kundenaccount hat einen Warenkorb sowie beliebig viele Bestellungen und Buchungen. 
+		       		  Kundenaccounts werden bei der Registrierung in der Weboberfläche angelegt.   
+|<<enumeration>> Rabattstatus      |AKTIVIERT : Rabatt wird bei Bestellungen einberechnet
+				  DEAKTIVIERT : Rabatt wird bei Bestellungen nicht einberechnet                       
+|Warenkorb         		   |Außer Kunden haben auch unregistrierte Nutzer einen Warenkorb, sind aber keine Klasse des Systems (dieser ist dann an keinen Account gebunden).
+				  Ein Kunde fügt Artikel in den Warenkorb hinzu bzw. entfernt sie. In einem Warenkorb befinden sich beliebig viele Artikel.
+				  In der Warenkorbansicht sollen zu jedem enthaltenen Artikel Anzahl und Gesamtpreis angezeigt werden ( ==> Assoziationsklasse Warenkorbartikel).
+				  Der Warenkorb kann gekauft werden und erzeugt dann eine Bestellung.      
+|Artikel              		   |Artikel sind die Artikel des Utensilienshops. Sie haben die Attribute name, preis und beschreibung.      
+|Artikelkatalog                    |Das Artikelangebot, d.h. beliebig viele Artikel, werden in einem Artikelkatalog zusammengefasst.
+				  Zum Anzeigen einer Artikelübersicht wird die Methode getAlleArtikel() verwendet. Die Artikel können nach Name durchsucht werden. Der Warenkorb greift auf die Methode artikelFinden() zu, um ein Artikel-Objekt zu erhalten, wenn der Kunden einen Artikel zu diesem hinzufügt. Das Artikelangebot kann durch Hinzufügen und Entfernen von Artikeln verwaltet werden
+|Inventar            		   |Im Inventar werden zu den Artikeln die jeweilig im Lager vorhandene Anzahl gespeichert (==> Assoziationsklasse Inventarobjekt).
+				  Um die Verfügbarkeit eines Artikels zu prüfen, muss dieser erst mit artikelFinden() gefunden werden. Wenn das Artikelangebot verwaltet wird, müssen die Artikel auch hier hinzugefügt bzw. entfernt werden.
+|Inventarobjekt                    |Die in dieser Assoziationsklasse gespeicherte Anzahl kann erhöht und verringert werden. Außerdem muss beim Hinzufügen eines Artikels zu einer Bestellung erst einmal überprüft werden, ob der Artikel noch in der ausgewählten Menge verfügbar ist.       
+|Bestellung              	   |Eine Bestellung wird erstellt, wenn der Kunde einen Warenkorb kaufen will. Der Kunde kann diese dann überprüfen und schließlich abschließen (über den Buchungsmanager). Eine Buchung hat die Attribute datum (das Buchungsdatum) und preis, welcher der Gesamtpreis ist.
+				  Eine Buchung besteht aus mehreren Bestellpositionen (==> Assoziationsklasse Bestellposition), die einzeln über die Methode bestellpositionHinzufügen() aus den einzelnen enthaltenen Artikel des Warenkorbs entstehen. Danach wird der Gesamtpreis berechnet.
+|Bestellposition              	   |Eine Bestellposition fasst zu einem Artikel produktname, anzahl und preis (Gesamtpreis) zusammen.       
+|Bestellungsmanager            	   |Der Bestellungsmanager fasst alle Bestellungen (beliebig viele) zusammen. Über ihn kann eine Bestellung abgeschlossen werden und die Finanzübersicht des Vorstands kann sich alle Bestellungen anzeigen lassen.      
+|Artist               		   |Klasse für Artistenaccounts, die von der Nutzer-Klasse erbt. Ein Artist hat die Attribute talent und hat beliebig viele Sperrzeiten. 
+				  Er kann Mitglied einer Artistengruppe sein, für die er Shows erstellen kann. Außerdem kann er beliebig viele ihm zugehörige Workshops erstellen oder diese löschen. Er kann weiterhin Sperrzeiten hinzufügen und löschen. 
+				  Bei der Auswahl eines Termins zum Buchen einer Veranstaltung werden alle Termine des (Workshop) / der (Show) veranstaltenden Artisten über getTermine() geladen, so dass diese gar nicht ausgewählt werden können. 
+  				  Artistenaccounts werden vom Vorstand angelegt.
+|Sperrzeit               	   |Eine Sperrzeit hat die Attribute datum, uhrzeit und dauer, wobei das Datum je nach Regelmäßigkeit der Sperrzeit als konkretes Datum oder als Startdatum fungiert.        
+|<<enumeration>> Regelmäßigkeit    |Mögliche Regelmäßigkeiten sind EINMALIG, TÄGLICH, WÖCHENTLICH und MONATLICH.    
+|Artistengruppe                    |Eine Artistengruppe hat das Attribut name und hat 2 oder mehr Artisten.
+				  Eine Artistengruppe hat außerdem beliebig viele Shows. Artisten können über die Gruppe Shows erstellen und löschen.       
+|Veranstaltung           	   |Die Oberklasse für alle Veranstaltungen. 
+				  Eine Veranstaltung hat die Attribute name, preis, beschreibung, dauer und angebotszeitraum, für diesen sie gebucht werden kann. 
+				  Eine Veranstaltung kann beliebig viele Kommentare, Bewertungen und Termine haben. 
+				  Bei der Auswahl eines Termins zum Buchen einer Veranstaltung werden alle Termine des (Workshop) / der (Show) veranstaltenden Artisten über getTermine() (des/der Artisten) geladen, so dass diese gar nicht ausgewählt werden können. Die Methode ruft dann die getTermine()-Methode der von den Artisten/Artistengruppen aggregierten Veranstaltungen auf.
+				  Termine können hinzugefügt, aber nicht gelöscht werden, da gebuchte Veranstaltungen nicht stornierbar sind. 
+				  Kunden können Bewertungen und Kommentare zu Veranstaltungen hinzufügen oder löschen.
+				  Veranstaltungen können nur gelöscht werden, wenn sie für keine zukünftigen Termine mehr gebucht sind.
+|Termin               		   |Ein Veranstaltungstermin hat die Attribute datum und uhrzeit.      
+|Bewertung              	   |Eine Bewertung einer Veranstaltung hat die Attribute autor, und wert.       
+|Kommentare               	   |Ein Kommentar einer Veranstaltung hat die Attribute autor, datum, uhrzeit und text.    
+|Veranstaltungskatalog		   |Das Veranstaltungsangebot, d.h. beliebig viele Veranstaltungen, werden in einem Veranstaltungskatalog zusammengefasst. 
+				  Zum Anzeigen einer Veranstaltungsübersicht wird die Methode getAlleVeranstaltungen() verwendet.
+				  Zur Buchung einer Veranstaltung wird diese das Veranstaltungs-Objekt mit veranstaltungFinden() gefunden und an die Buchung weitergereicht.Die Artikel können nach Name durchsucht werden.
+				  Bei Erstellen einer Veranstaltung wird diese auch dem Kalatog hinzugefügt.
+|Show                		   |Unterklasse, die von Veranstaltung erbt. Eine Show ist einer Artistengruppe zugeordnet und kann von einem beliebigen Gruppenmitglied erstellt oder gelöscht werden. Eine Show findet immer in der Vereinshalle statt und hat daher kein Attribut ort.       
+|Workshop             		   |Unterklasse, die von Veranstaltung erbt. Ein Workshop ist einem Artisten zugeordnet und hat die Attribute ort (Vereinshalle oder eine auswärtige Adresse) und häufigkeit. Die Häufigkeit kommt nur ins Spiel, wenn der Typ (<<enumeration>> Typ) des Workshops MEHRTÄGIG ist, und gibt an, wie viele Tage hintereinander der Workshops besucht werden muss.     
+|<<enumeration>> Typ               |EINTÄGIG : Der Workshop findet an nur einem Termin statt.
+				  MEHRTÄGIG : Der Workshop findet mehrere Tage hintereinander statt.
+|Buchung               		   |Eine Buchung wird zum Buchen einer einzelnen Veranstaltung angelegt. Sie hat die Attribute preis und datum (das Datum des Buchungszeitpunkts). Zur jeweiligen Veranstaltung hat sie außerdem einen Buchungstermin (==> Assoziationsklasse Buchungstermin).      
+|Buchungstermin                	   |Der Buchungstermin zu einer Veranstaltung umfasst datum und uhrzeit und wird beim Abschluss der Buchung zu den Terminen der Veranstaltung hinzugefügt.       
+|Buchungsmanager                   |Der Buchungsmanager fasst alle Buchungen (beliebig viele) zusammen. Über ihn kann eine Buchung abgeschlossen werden und die Finanzübersicht des Vorstands kann sich alle Buchungen anzeigen lassen.       
+|Vorstand                  	   |Account des Vorstands mit Administrationsfunktionen. Diese umfassen das Erstellen und Löschen von Gruppen (nur möglich, wenn auch die Shows der jeweiligen Gruppe löschbar ist.), das Verwalten des Artikelangebots, das Anzeigen jeglicher systeminterner Informationen (insbesondere eine Finanz- und eine Veranstaltungsübersicht), das Einstellen allgemeiner Sperrzeiten, das Einstellen der Aufwandspauschale und das Einstellen der Höhe des Rabatts.
+|Finanzübersicht                   |In der Finanzübersicht ist im Attribut guthaben das Guthaben des Artistenvereins gespeichert. 
+				  Sie gewährt Überblick über eingegangene Buchungen und Bestellungen und darüber, wie diese das Guthaben beeinflusst haben.
+				  Bei Abschluss einer Bestellung oder Buchung wird das Guthaben geändert.
+                   
+|===
+
+== Akzeptanztestfälle
+Mithilfe von Akzeptanztests wird geprüft, ob die Software die funktionalen Erwartungen und Anforderungen im Gebrauch erfüllt. Diese sollen und können aus den Anwendungsfallbeschreibungen und den UML-Sequenzdiagrammen abgeleitet werden. D.h., pro (komplexen) Anwendungsfall gibt es typischerweise mindestens ein Sequenzdiagramm (welches ein Szenarium beschreibt). Für jedes Szenarium sollte es einen Akzeptanztestfall geben. Listen Sie alle Akzeptanztestfälle in tabellarischer Form auf.
+Jeder Testfall soll mit einer ID versehen werde, um später zwischen den Dokumenten (z.B. im Test-Plan) referenzieren zu können.
+
+|===
+|ID | 001 
+|Anwendungsfall | Artikel suchen
+|Vorbedingung | Artikelkatalog enthält Artikel. Dieser Artikel existiert nicht im Artikelkatalog. 
+|Event  | Ein Nutzer gibt einen Suchbegriff ein, um einen Artikel zu finden, und drückt "find!". 
+|erwartetes Ergebnis  | Die Seite wird neu geladen mit den gefundenen Treffern. Da der Artikel nicht im Katalog ist wird eine Fehlermeldung angezeigt. Fehlermeldung: "Der Artikel, den Sie suchen, ist nicht im Katalog vorhanden."
+|===
+
+|===
+|ID | 002 
+|Anwendungsfall | Artikel suchen 
+|Vorbedingung | Artikelkatalog enthält Artikel. Dieser Artikel existiert im Artikelkatalog.
+|Event  | Ein Nutzer gibt einen Suchbegriff ein, um einen Artikel zu finden, und drückt "find!". 
+|erwartetes Ergebnis  | Die Seite wird neu geladen mit den gefundenen Treffern. Da der Artikel im Katalog ist, wird er angezeigt als einziger Artikel.
+|===
+
+|===
+|ID | 003
+|Anwendungsfall| Einloggen
+|Vorbedingung| Das System hat existierende Benutzer.
+|Event| Ein unidentifizierter Benutzer öffnet den login screen, gibt Anmeldedaten eines nicht existierenden Benutzers an und drückt auf "login".
+|erwartetes Ergebnis| Die Seite überprüft die Daten, lädt die Seite erneut und zeigt eine Fehlermeldung an. Fehlermeldung :"Benutzername oder Passwort sind nicht korrekt". Der Benutzer bleibt unidentifiziert.
+|===
+
+|===
+|ID | 004
+|Anwendungsfall| Einloggen
+|Vorbedingung| Das System hat existierende Benutzer.
+|Event| Ein unidentifizierter Benutzer öffnet den login screen, gibt Anmeldedaten eins existierenden Benutzers an (Mustermann, 123) und drückt auf "login".
+|erwartetes Ergebnis| Der Benutzer ist jetzt als "Mustermann" identifiziert und zum "welcome screen" weiter geleitet. Der Benutzer hat jetzt alle Zugriffsrechte auf die Funktionen, die seine Rolle hat(Kunde, Artist, Vorstand). In diesem Fall "Kunde". 
+|===
+
+|===
+|ID | 005
+|Anwendungsfall| Ausloggen
+|Vorbedingung| Ein Benutzer ist identifiziert und benutzt das System.
+|Event| Der Benutzer drückt auf "logout".
+|erwartetes Ergebnis| Er bekommt unidentifiziert und verliert alle Zugriffsrechte, die seine Rolle (Kunde, Artist, Vorstand) hatte.
+|===
+
+|===
+|ID | 006
+|Anwendungsfall| Registrieren
+|Vorbedingung| Der Benutzer, der sich jetzt registrieren will, existiert noch nicht im System.
+|Event| Ein unidentifizerter Benutzer öffnet den register screen, füllt das Registrierungsformular aus und sendet es ab, indem er auf "register" drückt.
+|erwartetes Ergebnis| Der Benutzer ist jetzt mit seinem Benutzernamen eingeloggt und identifiziert. Die Datenbank nimmt den Nutzer in ihr System auf. Der Benutzer hat jetzt alle Zugriffsrechte die ihm seine Rolle gestatten (Kunde).
+|===
+
+|===
+|ID | 007
+|Anwendungsfall| Registrieren
+|Vorbedingung| Der Benutzer, der sich jetzt registrieren will, existiert bereits im System.
+|Event| Ein unidentifizerter Benutzer öffnet den register screen, füllt das Registrierungsformular aus und sendet es ab, indem er auf "register" drückt.
+|erwartetes Ergebnis| Die Seite überprüft die Daten, lädt die Seite erneut und zeigt eine Fehlermeldung an. Fehlermeldung: "Es existiert bereits ein Benutzer mit diesem Benutzernamen" || "Das von Ihnen angegebene Passwort enspricht nicht den Anforderungen eines Passworts unseres System" (Es wird angezeigt wie das Passwort aussehen sollte. z.B. Länge, etc.). Der Benutzer verbleibt unidentifiziert.
+|===
+
+|===
+|ID | 008
+|Anwendungsfall| Eigene Veranstaltungen einsehen
+|Vorbedingung| Der Benutzer ist als Artist registriert und eingeloggt. Er hat eine Veranstaltung in der er teilnimmt ("Die Magie des Feuers", Veranstaltung).
+|Event| Der Benutzer geht auf sein Profil und drückt auf "Eigene Veranstaltungen einsehen".
+|erwartetes Ergebnis| Er wird weitergeleitet auf sein Profil, mit einem neuen Fenster in der Mitte. Dort werden alle Veranstaltungen
+gezeigt, die der Benutzer hat(Als (Name, Typ)). Hier wird nur ein Eintrag gefunden: ("Die Magie des Feuers", Veranstaltung).
+|===
+
+|===
+|ID | 009
+|Anwendungsfall| Eigene Veranstaltungen einsehen
+|Vorbedingung| Der Benutzer ist als Artist registriert und eingeloggt. Er hat keine Veranstaltung in der er teilnimmt.
+|Event| Der Benutzer geht auf sein Profil und drückt auf "Eigene Veranstaltungen einsehen".
+|erwartetes Ergebnis| Er wird weitergeleitet auf sein Profil, mit einem neuen Fenster in der Mitte. Dort werden alle Veranstaltungen gezeigt, die der Benutzer hat. Hier wird kein Eintrag gefunden. Es wird eine Nachricht angezeigt: "Keine Veranstaltungen gefunden.".
+|===
+
+|===
+|ID | 010
+|Anwendungsfall| Veranstaltungen erstellen
+|Vorbedingung| Der Benutzer ist als Artist registriert und eingeloggt. 
+|Event| Er geht auf sein Profil und drückt auf "Workshop erstellen". Er wird auf eine Seite mit einem Formular weitergeleitet. Hier gibt er die Spezifikationen in ein Formular ein. Anschließend drückt er auf "erstellen".
+|erwartetes Ergebnis| Die Spezifikationen sind angemessen. Die Veranstaltung wird als Workshop zum Veranstaltungskatalog und zur Datenbank hinzugefügt. Der Benutzer wird auf sein Profil zurückgeleitet und bekommt eine Bestätigungsmeldung angezeigt. "Veranstaltung erstellt."
+|===
+
+|===
+|ID | 011
+|Anwendungsfall| Veranstaltung bearbeiten
+|Vorbedingung| Der Benutzer ist als Artist registriert und eingeloggt. Er hat eine Veranstaltung. ("Feuerschlucken für Anfänger", Workshop)
+|Event| Der Benutzer geht auf sein Profil, drückt "Eigene Veranstaltungen einsehen" um sich seine Veranstaltungen listen zu lassen. dort klickt er auf eine Veranstaltung ("Feuerschlucken für Anfänger", Workshop) und wird weitergeleited auf die Seite dieser Veranstaltung. Dort klickt er auf "Veranstaltung bearbeiten", wird auf ein Formular, das mit den bereits bestehenden Daten ausgefüllt ist, geleitet und ändert die Teilnehmerzahl. Er erhöht sie von 15 auf 20. Dann drückt er auf "speichern".
+|erwartetes Ergebnis| Er wird zurückgeleited auf die Seite der Veranstaltung. Die Änderung wird in der Datenbank gespeichert und der Veranstaltungskatalog wird aktualisiert. Dem Benutzer wird eine Meldung angezeigt: "Änderungen gespeichert".
+|===
+
+|===
+|ID | 012 
+|Anwendungsfall| Sperrzeiten eintragen
+|Vorbedingung| Der Benutzer ist als Artist registriert und eingeloggt. 
+|Event| Der Benutzer geht auf sein Profil, klickt auf "Sperrzeiten bearbeiten" und wird weitergeleitet zu einem Kalendar. Hier fügt er eine Sperrzeit für Mittwochs 4 p.m. ein. Dauer = 1 Stunde. Anschließend klickt er auf "speichern".
+|erwartetes Ergebnis| Der Benutzer wird weitergeleitet zu seinem Profil. Ihm wird eine Nachricht angezeigt. ("Sperrzeiten erfolgreich bearbeitet. Sperrzeit hinzugefügt (Mittwochs, 16:00 - 17:00)"). Die veränderte Sperrzeit des Artisten wird in der Datenbank gespeichert. 
+|===
+
+|===
+|ID | 013 
+|Anwendungsfall| Artikel kaufen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 014
+|Anwendungsfall| Artikel in den Warenkorb legen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 015 
+|Anwendungsfall| Veranstaltung buchen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 016  
+|Anwendungsfall| Veranstaltung bewerten und kommentieren
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 017 
+|Anwendungsfall| Allgemeine Sperrzeiten eintragen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 018 
+|Anwendungsfall| Angebote und Buchungen abrufen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 019 
+|Anwendungsfall| Artikel bestellen
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 020 
+|Anwendungsfall| Artikel verwalten
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 021 
+|Anwendungsfall| Inventar verwalten
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 022 
+|Anwendungsfall| Artisten verwalten
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 023 
+|Anwendungsfall| Gruppen verwalten
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+|===
+|ID | 024 
+|Anwendungsfall| Finanzübersicht anzeigen 
+|Vorbedingung|
+|Event|
+|erwartetes Ergebnis|
+|===
+
+
+== Glossar
+Sämtliche Begriffe, die innerhalb des Projektes verwendet werden und deren gemeinsames Verständnis aller beteiligten Stakeholder essentiell ist, sollten hier aufgeführt werden.
+Insbesondere Begriffe der zu implementierenden Domäne wurden bereits beschrieben, jedoch gibt es meist mehr Begriffe, die einer Beschreibung bedürfen. +
+Beispiel: Was bedeutet "Kunde"? Ein Nutzer des Systems? Der Kunde des Projektes (Auftraggeber)?
+
+== Offene Punkte
+Offene Punkte werden entweder direkt in der Spezifikation notiert. Wenn das Pflichtenheft zum finalen Review vorgelegt wird, sollte es keine offenen Punkte mehr geben.
