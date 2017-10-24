@@ -135,10 +135,10 @@ Und Der Vorstand kann sich eine "Finanzübersicht anzeigen" lassen, die ähnlich
 === Muss-Kriterien
 
 . Datenbank: persistente Speicherung von::
-.. Nutzerdaten
-.. Artistengruppen
-.. Artikel- und Veranstaltungsangebot
-.. Buchungen und Bestellungen
+.. 	Nutzerdaten
+.. 	Artistengruppen
+.. 	Artikel- und Veranstaltungsangebot
+.. 	Buchungen und Bestellungen
 
 . Accountverwaltung
 .. Registrierung unauthentifizierter Nutzer als Kunden
